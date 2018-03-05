@@ -47,24 +47,25 @@ public class ChatServerProcessThread extends Thread {
 				if ("SYN".equals(token[0])) {
 					clientNickName = token[1];
 					pw.println("SYNACK [SERVER] 채팅방에 접속하였습니다. " + clientNickName + "님 환영합니다.");
-					if (clientBroadcastList.size() > 0) {
-						synchronized (clientBroadcastList) {
+					synchronized (clientBroadcastList) {
+						if (clientBroadcastList.size() > 0) {
 							Iterator<PrintWriter> it = clientBroadcastList.iterator();
 							while (it.hasNext()) {
 								PrintWriter otherClientPW = it.next();
 								otherClientPW.println("MSG [SERVER] " + clientNickName + "(이)가 접속하셨습니다.");
 							}
 						}
+						clientBroadcastList.add(pw);
 					}
-					clientBroadcastList.add(pw);
+					
 					continue;
 				}
 
 				if ("FIN".equals(token[0])) {
 					pw.println("FINACK [SERVER] 채팅방을 나갑니다.");
 					clientBroadcastList.remove(pw);
-					if (clientBroadcastList.size() > 0) {
-						synchronized (clientBroadcastList) {
+					synchronized (clientBroadcastList) {
+						if (clientBroadcastList.size() > 0) {
 							Iterator<PrintWriter> it = clientBroadcastList.iterator();
 							while (it.hasNext()) {
 								PrintWriter otherClientPW = it.next();
