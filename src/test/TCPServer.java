@@ -11,17 +11,22 @@ import java.net.SocketException;
 
 public class TCPServer {
 	private static final int SERVER_PORT = 5000;
+	private static final String SERVER_IP = "192.168.1.9";
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		ServerSocket serverSocket = null;
 		try {
 			// 1. 서버소켓 생성
 			serverSocket = new ServerSocket();
+
+			//Time-wait 상태에서 서버 재실행이 가능하게 끔 함
+			serverSocket.setReuseAddress( true );
 			
 			// 2. Binding => InetSocketAddress를 사용하여 바인딩
 			String localhostAddr = InetAddress.getLocalHost().getHostAddress();
-			serverSocket.bind( new InetSocketAddress(localhostAddr, SERVER_PORT) );
-			System.out.println("[Server] " + localhostAddr + ":" + SERVER_PORT + " binded");
+
+			serverSocket.bind( new InetSocketAddress(SERVER_IP, SERVER_PORT) );
+			System.out.println("[Server] " + SERVER_IP + ":" + SERVER_PORT + " binded");
 			// 3. Wait for connection request(accept)
 			System.out.println("[Server] Started! Waiting... :D");
 			Socket socket = serverSocket.accept(); // Blocking state
@@ -55,7 +60,7 @@ public class TCPServer {
 					System.out.println("[Server] received: " + data);
 					
 					// 7. Write a data(write)
-					
+					Thread.sleep(100);
 					os.write(data.getBytes("UTF-8"));
 				}
 			} catch (SocketException e) {
